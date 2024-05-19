@@ -64,8 +64,8 @@
     },
     "C_Cpp.codeAnalysis.clangTidy.enabled": true,
     "C_Cpp.codeAnalysis.exclude": {
-        "*_m.cc": true,
-        "*_m.h": true
+        "src/*_m.cc": true,
+        "src/*_m.h": true,
     },
     "C_Cpp.codeAnalysis.clangTidy.checks.enabled": [
         "cppcoreguidelines-*",
