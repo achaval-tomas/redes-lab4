@@ -1,0 +1,11 @@
+out/
+results/
+.qtenvrc
+.settings/
+lab4_dbg
+lab4
+Makefile
+General.anf
+*_m.cc
+*_m.h
+.cmdenv-log
