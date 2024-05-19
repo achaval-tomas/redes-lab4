@@ -1,22 +1,22 @@
 #ifndef NET
 #define NET
 
-#include <string.h>
 #include <omnetpp.h>
 #include <packet_m.h>
+#include <string.h>
 
 using namespace omnetpp;
 
-class Net: public cSimpleModule {
+class Net : public cSimpleModule {
 private:
-
 public:
     Net();
     virtual ~Net();
+
 protected:
     virtual void initialize();
     virtual void finish();
-    virtual void handleMessage(cMessage *msg);
+    virtual void handleMessage(cMessage* msg);
 };
 
 Define_Module(Net);
@@ -35,10 +35,9 @@ void Net::initialize() {
 void Net::finish() {
 }
 
-void Net::handleMessage(cMessage *msg) {
-
+void Net::handleMessage(cMessage* msg) {
     // All msg (events) on net are packets
-    Packet *pkt = (Packet *) msg;
+    Packet* pkt = (Packet*)msg;
 
     // If this node is the final destination, send to App
     if (pkt->getDestination() == this->getParentModule()->getIndex()) {

@@ -1,25 +1,27 @@
 #ifndef LNK
 #define LNK
 
-#include <string.h>
 #include <omnetpp.h>
 #include <packet_m.h>
+#include <string.h>
 
 using namespace omnetpp;
 
-class Lnk: public cSimpleModule {
+class Lnk : public cSimpleModule {
 private:
     cQueue buffer;
-    cMessage *endServiceEvent;
+    cMessage* endServiceEvent;
     simtime_t serviceTime;
     cOutVector bufferSizeVector;
+
 public:
     Lnk();
     virtual ~Lnk();
+
 protected:
     virtual void initialize();
     virtual void finish();
-    virtual void handleMessage(cMessage *msg);
+    virtual void handleMessage(cMessage* msg);
 };
 
 Define_Module(Lnk);
@@ -42,12 +44,11 @@ void Lnk::initialize() {
 void Lnk::finish() {
 }
 
-void Lnk::handleMessage(cMessage *msg) {
-
+void Lnk::handleMessage(cMessage* msg) {
     if (msg == endServiceEvent) {
         if (!buffer.isEmpty()) {
             // dequeue
-            Packet* pkt = (Packet*) buffer.pop();
+            Packet* pkt = (Packet*)buffer.pop();
             bufferSizeVector.record(buffer.getLength());
             // send
             send(pkt, "toOut$o");
@@ -65,7 +66,7 @@ void Lnk::handleMessage(cMessage *msg) {
                 scheduleAt(simTime() + 0, endServiceEvent);
             }
         } else {
-            //msg is from out, send to net
+            // msg is from out, send to net
             send(msg, "toNet$o");
         }
     }
