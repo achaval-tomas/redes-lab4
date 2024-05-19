@@ -1,9 +1,9 @@
 #ifndef APP
 #define APP
 
+#include "packet_m.h"
 #include <omnetpp.h>
 #include <string.h>
-#include "packet_m.h"
 
 using namespace omnetpp;
 
