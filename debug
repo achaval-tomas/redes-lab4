@@ -1,2 +1,2 @@
 #!/bin/bash
-opp_makemake -f --deep -O out -I. && make MODE=debug all && ./lab4_dbg
+opp_makemake -f --deep -O out -I./src && make MODE=debug all && ./lab4_dbg
