@@ -10,18 +10,18 @@ using namespace omnetpp;
 class Lnk : public cSimpleModule {
 private:
     cQueue buffer;
-    cMessage* endServiceEvent;
+    cMessage* endServiceEvent = NULL;
     simtime_t serviceTime;
     cOutVector bufferSizeVector;
 
 public:
     Lnk();
-    virtual ~Lnk();
+    ~Lnk() override;
 
 protected:
-    virtual void initialize();
-    virtual void finish();
-    virtual void handleMessage(cMessage* msg);
+    void initialize() override;
+    void finish() override;
+    void handleMessage(cMessage* msg) override;
 };
 
 Define_Module(Lnk);
@@ -29,7 +29,6 @@ Define_Module(Lnk);
 #endif /* LNK */
 
 Lnk::Lnk() {
-    endServiceEvent = NULL;
 }
 
 Lnk::~Lnk() {
@@ -48,7 +47,7 @@ void Lnk::handleMessage(cMessage* msg) {
     if (msg == endServiceEvent) {
         if (!buffer.isEmpty()) {
             // dequeue
-            Packet* pkt = (Packet*)buffer.pop();
+            Packet* pkt = dynamic_cast<Packet*>(buffer.pop());
             bufferSizeVector.record(buffer.getLength());
             // send
             send(pkt, "toOut$o");

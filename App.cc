@@ -9,18 +9,18 @@ using namespace omnetpp;
 
 class App : public cSimpleModule {
 private:
-    cMessage* sendMsgEvent;
+    cMessage* sendMsgEvent = NULL;
     cStdDev delayStats;
     cOutVector delayVector;
 
 public:
     App();
-    virtual ~App();
+    ~App() override;
 
 protected:
-    virtual void initialize();
-    virtual void finish();
-    virtual void handleMessage(cMessage* msg);
+    void initialize() override;
+    void finish() override;
+    void handleMessage(cMessage* msg) override;
 };
 
 Define_Module(App);

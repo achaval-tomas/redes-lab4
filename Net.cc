@@ -11,12 +11,12 @@ class Net : public cSimpleModule {
 private:
 public:
     Net();
-    virtual ~Net();
+    ~Net() override;
 
 protected:
-    virtual void initialize();
-    virtual void finish();
-    virtual void handleMessage(cMessage* msg);
+    void initialize() override;
+    void finish() override;
+    void handleMessage(cMessage* msg) override;
 };
 
 Define_Module(Net);
@@ -37,7 +37,7 @@ void Net::finish() {
 
 void Net::handleMessage(cMessage* msg) {
     // All msg (events) on net are packets
-    Packet* pkt = (Packet*)msg;
+    Packet* pkt = dynamic_cast<Packet*>(msg);
 
     // If this node is the final destination, send to App
     if (pkt->getDestination() == this->getParentModule()->getIndex()) {
