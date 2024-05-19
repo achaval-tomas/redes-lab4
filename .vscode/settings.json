@@ -1,4 +1,7 @@
 {
+    "[omnetpp-ned]": {
+        "editor.fontLigatures": false,
+    },
     "files.associations": {
         "*.cps": "javascript",
         "*.h": "cpp",
