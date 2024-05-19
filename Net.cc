@@ -2,8 +2,8 @@
 #define NET
 
 #include <omnetpp.h>
-#include <packet_m.h>
 #include <string.h>
+#include "packet_m.h"
 
 using namespace omnetpp;
 
