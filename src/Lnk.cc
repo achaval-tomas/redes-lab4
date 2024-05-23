@@ -37,7 +37,7 @@ Lnk::~Lnk() {
 
 void Lnk::initialize() {
     endServiceEvent = new cMessage("endService");
-    bufferSizeVector.setName("Buffer Size");
+    bufferSizeVector.setName("BufferSize");
 }
 
 void Lnk::finish() {

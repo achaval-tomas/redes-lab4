@@ -72,7 +72,6 @@ void App::handleMessage(cMessage* msg) {
         simtime_t delay = simTime() - msg->getCreationTime();
         delayStats.collect(delay);
         delayVector.record(delay);
-        // delete msg
-        delete (msg);
+        delete msg;
     }
 }
