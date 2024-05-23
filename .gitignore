@@ -2,8 +2,8 @@ out/
 results/
 .qtenvrc
 .settings/
-lab4_dbg
-lab4
+redes-lab4_dbg
+redes-lab4
 Makefile
 General.anf
 *_m.cc
