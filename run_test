@@ -1,0 +1,8 @@
+#!/bin/bash
+gen_interval=$1
+
+sed -i "s/Network.node\[0\].app.interArrivalTime = exponential\(.*\)/Network.node\[0\].app.interArrivalTime = exponential\($gen_interval\)/" ./omnetpp.ini
+sed -i "s/Network.node\[2\].app.interArrivalTime = exponential\(.*\)/Network.node\[2\].app.interArrivalTime = exponential\($gen_interval\)/" ./omnetpp.ini
+./build
+./lab4_dbg -u Cmdenv
+./export_all_vecs.py
