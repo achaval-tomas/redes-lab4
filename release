@@ -1,2 +1,2 @@
 #!/bin/bash
-opp_makemake -f --deep -O out -I./src && make MODE=release all && ./redes-lab4
+opp_makemake -f --deep -O out -I./src && make MODE=release all && ./lab4
