@@ -12,6 +12,7 @@ private:
     cMessage* sendMsgEvent = NULL;
     cStdDev delayStats;
     cOutVector delayVector;
+    cOutVector hopCountVector;
 
 public:
     App();
@@ -44,6 +45,7 @@ void App::initialize() {
     // Initialize statistics
     delayStats.setName("TotalDelay");
     delayVector.setName("Delay");
+    hopCountVector.setName("HopCount");
 }
 
 void App::finish() {
@@ -68,10 +70,14 @@ void App::handleMessage(cMessage* msg) {
         simtime_t departureTime = simTime() + par("interArrivalTime");
         scheduleAt(departureTime, sendMsgEvent);
     } else { // else, msg is a packet from net layer
-        // compute delay and record statistics
-        simtime_t delay = simTime() - msg->getCreationTime();
+        Packet* pkt = dynamic_cast<Packet*>(msg);
+
+        hopCountVector.record(pkt->getHopCount());
+
+        simtime_t delay = simTime() - pkt->getCreationTime();
         delayStats.collect(delay);
         delayVector.record(delay);
-        delete msg;
+        
+        delete pkt;
     }
 }

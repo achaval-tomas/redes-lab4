@@ -48,6 +48,7 @@ void Net::handleMessage(cMessage* msg) {
         // We send to link interface #0, which is the
         // one connected to the clockwise side of the ring
         // Is this the best choice? are there others?
+        pkt->setHopCount(pkt->getHopCount() + 1);
         send(msg, "toLnk$o", 0);
     }
 }
