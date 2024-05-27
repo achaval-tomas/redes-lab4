@@ -37,7 +37,9 @@ protected:
     void handleMessage(cMessage* msg) override;
     void handleDataPkt(Packet* pkt);
     void handleHelloMessage(HelloMsg* msg);
-    // void computeDistanceVector(Address to, Address via, Cost cost);
+    bool updateCheapestExitTo(Address destination, Address via, Cost cost);
+    void shareDistanceVector();
+    std::vector<DestinationCost> computeDistanceVector();
 };
 
 Define_Module(Net);
@@ -102,17 +104,63 @@ void Net::handleHelloMessage(HelloMsg* msg) {
     Cost cost = 1;
 
     routingTable[neighbourAddress][neighbourAddress] = cost;
+
+    bool distanceVectorChanged = updateCheapestExitTo(neighbourAddress, neighbourAddress, cost);
+    if (distanceVectorChanged) {
+        shareDistanceVector();
+    }
 }
 
-// void Net::computeDistanceVector(Address destination, Cost cost) {
-//     if (cost < routingTable[destination][cheapestExits[destination]]){
-//         routingTable[destination][heapestExits[destination]]
-//     }
+bool Net::updateCheapestExitTo(Address destination, Address via, Cost cost) {
+    if (cheapestExits.count(destination) == 0) {
+        cheapestExits[destination] = via;
+        return true;
+    }
+    Address currentExit = cheapestExits[destination];
 
+    assert(routingTable[destination].count(currentExit) == 1);
 
-//     routingTable[to][via] = std::min(cost, routingTable.at(neighbourAddress));
+    Cost currentCost = routingTable[destination][currentExit];
 
-// }
+    if (cost < currentCost) {
+        cheapestExits[destination] = via;
+        return true;
+    }
+
+    return false;
+}
+
+void Net::shareDistanceVector() {
+    auto distanceVector = computeDistanceVector();
+
+    DistanceVectorMsg* distanceVectorMsg = new DistanceVectorMsg();
+    distanceVectorMsg->setDistanceVectorArraySize(distanceVector.size());
+    for (size_t i = 0; i < distanceVector.size(); i++) {
+        distanceVectorMsg->setDistanceVector(i, distanceVector[i]);
+    }
+
+    for (auto& addressAndGate : neighbourGates) {
+        auto gate = addressAndGate.second;
+
+        send(distanceVectorMsg->dup(), "toLnk$o", gate);
+    }
+
+    delete distanceVectorMsg;
+}
+
+std::vector<DestinationCost> Net::computeDistanceVector() {
+    auto distanceVector = std::vector<DestinationCost>();
+
+    for (auto& destinationAndVia : cheapestExits) {
+        auto& destination = destinationAndVia.first;
+        auto& via = destinationAndVia.second;
+
+        auto cost = routingTable[destination][via];
+        distanceVector.push_back(DestinationCost { destination, cost });
+    }
+
+    return distanceVector;
+}
 
 // plan for distance vector routing
 // hello.msg -> will be used to know the net's index
