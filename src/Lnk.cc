@@ -11,7 +11,6 @@ class Lnk : public cSimpleModule {
 private:
     cQueue buffer;
     cMessage* endServiceEvent = NULL;
-    simtime_t serviceTime;
     cOutVector bufferSizeVector;
 
 public:
@@ -22,6 +21,7 @@ protected:
     void initialize() override;
     void finish() override;
     void handleMessage(cMessage* msg) override;
+    void handleEndServiceEvent();
 };
 
 Define_Module(Lnk);
@@ -45,16 +45,8 @@ void Lnk::finish() {
 
 void Lnk::handleMessage(cMessage* msg) {
     if (msg == endServiceEvent) {
-        if (!buffer.isEmpty()) {
-            // dequeue
-            Packet* pkt = dynamic_cast<Packet*>(buffer.pop());
-            bufferSizeVector.record(buffer.getLength());
-            // send
-            send(pkt, "toOut$o");
-            serviceTime = pkt->getDuration();
-            scheduleAt(simTime() + serviceTime, endServiceEvent);
-        }
-    } else { // msg is a packet
+        handleEndServiceEvent();
+    } else {
         if (msg->arrivedOn("toNet$i")) {
             // enqueue
             buffer.insert(msg);
@@ -69,4 +61,24 @@ void Lnk::handleMessage(cMessage* msg) {
             send(msg, "toNet$o");
         }
     }
+}
+
+void Lnk::handleEndServiceEvent() {
+    if (buffer.isEmpty()) {
+        return;
+    }
+
+    cMessage* msg = dynamic_cast<cMessage*>(buffer.pop());
+    bufferSizeVector.record(buffer.getLength());
+
+    send(msg, "toOut$o");
+
+    simtime_t serviceTime;
+    if (cPacket* pkt = dynamic_cast<cPacket*>(msg)) {
+        serviceTime = pkt->getDuration();
+    } else {
+        serviceTime = 0;
+    }
+
+    scheduleAt(simTime() + serviceTime, endServiceEvent);
 }
