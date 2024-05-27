@@ -71,6 +71,14 @@ void Lnk::handleEndServiceEvent() {
     cMessage* msg = dynamic_cast<cMessage*>(buffer.pop());
     bufferSizeVector.record(buffer.getLength());
 
+    // Check if this link is actually connected to some other node.
+    // If it isn't, then simply drop the packet.
+    if (!gate("toOut$o")->getNextGate()->isConnected()) {
+        delete msg;
+        EV_INFO << "[LNK] packet dropped due to unconnected link" << std::endl;
+        return;
+    }
+
     send(msg, "toOut$o");
 
     simtime_t serviceTime;

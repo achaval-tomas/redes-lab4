@@ -8,4 +8,5 @@ class DestinationCost {
 
 message DistanceVectorMsg {
     DestinationCost distanceVector[];
+    unsigned int sourceAddress;
 }

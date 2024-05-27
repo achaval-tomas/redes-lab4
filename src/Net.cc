@@ -5,6 +5,7 @@
 #include "distance_vector_m.h"
 #include "hello_m.h"
 #include "packet_m.h"
+#include <algorithm>
 #include <omnetpp.h>
 #include <string.h>
 #include <unordered_map>
@@ -23,7 +24,7 @@ private:
     // bestPaths[d] = v such that routingTable[d, v] is the lowest value in its row.
     // Maps any destination address to the gate we should send a packet destined to it.
     std::unordered_map<Address, Address> cheapestExits;
-    // routingTable[destino, vecino] = cost
+    // routingTable[destino, vecino] = costo
     // Maps a destination address to all the known costs via all the known neighbours.
     std::unordered_map<Address, std::unordered_map<Address, Cost>> routingTable;
 
@@ -37,7 +38,8 @@ protected:
     void handleMessage(cMessage* msg) override;
     void handleDataPkt(Packet* pkt);
     void handleHelloMessage(HelloMsg* msg);
-    bool updateCheapestExitTo(Address destination, Address via, Cost cost);
+    void handleDistanceVectorMessage(DistanceVectorMsg* msg);
+    bool updateCheapestExitTo(Address destination);
     void shareDistanceVector();
     std::vector<DestinationCost> computeDistanceVector();
 };
@@ -70,6 +72,8 @@ void Net::handleMessage(cMessage* msg) {
     // All msg (events) on net are packets
     if (Packet* pkt = dynamic_cast<Packet*>(msg)) {
         handleDataPkt(pkt);
+    } else if (DistanceVectorMsg* distanceVectorMsg = dynamic_cast<DistanceVectorMsg*>(msg)) {
+        handleDistanceVectorMessage(distanceVectorMsg);
     } else if (HelloMsg* hello = dynamic_cast<HelloMsg*>(msg)) {
         handleHelloMessage(hello);
     } else {
@@ -81,15 +85,34 @@ void Net::handleDataPkt(Packet* pkt) {
     // If this node is the final destination, send to App
     if (pkt->getDestination() == this->getParentModule()->getIndex()) {
         send(pkt, "toApp$o");
-    }
-    // If not, forward the packet to some else... to who?
-    else {
-        // We send to link interface #0, which is the
-        // one connected to the clockwise side of the ring
-        // Is this the best choice? are there others?
+    } else {
         pkt->setHopCount(pkt->getHopCount() + 1);
-        send(pkt, "toLnk$o", 0);
+
+        auto destination = pkt->getDestination();
+        auto cheapestExit = cheapestExits[destination];
+        auto gate = neighbourGates[cheapestExit];
+        send(pkt, "toLnk$o", gate);
     }
+}
+
+void Net::handleDistanceVectorMessage(DistanceVectorMsg* msg) {
+    auto sourceAddress = msg->getSourceAddress();
+    bool anyUpdate = false;
+
+    for (size_t i = 0; i < msg->getDistanceVectorArraySize(); i++) {
+        auto& destinationCost = msg->getDistanceVector(i);
+        auto destination = destinationCost.destination;
+        auto cost = destinationCost.cost;
+
+        routingTable[destination][sourceAddress] = cost;
+        anyUpdate |= updateCheapestExitTo(destination);
+    }
+
+    if (anyUpdate) {
+        shareDistanceVector();
+    }
+
+    delete msg;
 }
 
 void Net::handleHelloMessage(HelloMsg* msg) {
@@ -105,29 +128,33 @@ void Net::handleHelloMessage(HelloMsg* msg) {
 
     routingTable[neighbourAddress][neighbourAddress] = cost;
 
-    bool distanceVectorChanged = updateCheapestExitTo(neighbourAddress, neighbourAddress, cost);
+    bool distanceVectorChanged = updateCheapestExitTo(neighbourAddress);
     if (distanceVectorChanged) {
         shareDistanceVector();
     }
+
+    delete msg;
 }
 
-bool Net::updateCheapestExitTo(Address destination, Address via, Cost cost) {
-    if (cheapestExits.count(destination) == 0) {
-        cheapestExits[destination] = via;
-        return true;
+bool Net::updateCheapestExitTo(Address destination) {
+    auto& allExitsToDestination = routingTable[destination];
+    assert(!allExitsToDestination.empty());
+
+    auto& cheapestExit = *std::min_element(
+        allExitsToDestination.begin(),
+        allExitsToDestination.end(),
+        [](const std::pair<Address, Cost>& a, const std::pair<Address, Cost>& b) {
+            return a.second <= b.second;
+        });
+
+    // Check if cheapest exit for destination has not changed.
+    if (cheapestExits.count(destination) == 1 && cheapestExits.at(destination) == cheapestExit.first) {
+        return false;
     }
-    Address currentExit = cheapestExits[destination];
 
-    assert(routingTable[destination].count(currentExit) == 1);
+    cheapestExits[destination] = cheapestExit.first;
 
-    Cost currentCost = routingTable[destination][currentExit];
-
-    if (cost < currentCost) {
-        cheapestExits[destination] = via;
-        return true;
-    }
-
-    return false;
+    return true;
 }
 
 void Net::shareDistanceVector() {
@@ -138,6 +165,7 @@ void Net::shareDistanceVector() {
     for (size_t i = 0; i < distanceVector.size(); i++) {
         distanceVectorMsg->setDistanceVector(i, distanceVector[i]);
     }
+    distanceVectorMsg->setSourceAddress(nodeAddress);
 
     for (auto& addressAndGate : neighbourGates) {
         auto gate = addressAndGate.second;
@@ -161,11 +189,3 @@ std::vector<DestinationCost> Net::computeDistanceVector() {
 
     return distanceVector;
 }
-
-// plan for distance vector routing
-// hello.msg -> will be used to know the net's index
-// distance_vector.msg -> will be used to send DV
-
-// le mando a mis vecinos un hello
-// cuando recibo un hello, me fijo su índice y ese es un vecino mío, borro el paquete
-// cuando detecto un vecino nuevo, actualizo mi DV y se lo mando a mis vecinos
