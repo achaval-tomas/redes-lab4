@@ -107,8 +107,9 @@ void Net::handleDistanceVectorMessage(DistanceVectorMsg* msg) {
         }
         auto cost = destinationCost.cost;
 
-        // MAYBE: replace that 1 for neighbourCosts[sourceAddress]
-        routingTable[destination][sourceAddress] = cost + 1;
+        auto neighbourCost = routingTable[sourceAddress][cheapestExits[sourceAddress]];
+        assert(neighbourCost == 1);
+        routingTable[destination][sourceAddress] = cost + neighbourCost;
         anyUpdate |= updateCheapestExitTo(destination);
     }
 
