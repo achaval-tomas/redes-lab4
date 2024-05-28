@@ -102,9 +102,13 @@ void Net::handleDistanceVectorMessage(DistanceVectorMsg* msg) {
     for (size_t i = 0; i < msg->getDistanceVectorArraySize(); i++) {
         auto& destinationCost = msg->getDistanceVector(i);
         auto destination = destinationCost.destination;
+        if (destination == nodeAddress) {
+            continue;
+        }
         auto cost = destinationCost.cost;
 
-        routingTable[destination][sourceAddress] = cost;
+        // MAYBE: replace that 1 for neighbourCosts[sourceAddress]
+        routingTable[destination][sourceAddress] = cost + 1;
         anyUpdate |= updateCheapestExitTo(destination);
     }
 
