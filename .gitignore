@@ -9,3 +9,5 @@ General.anf
 *_m.cc
 *_m.h
 .cmdenv-log
+.cache
+compile_commands.json
