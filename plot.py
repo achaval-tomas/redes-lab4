@@ -4,6 +4,9 @@ import matplotlib.axes
 import matplotlib.lines
 import matplotlib.pyplot as plt
 import pathlib
+import sys
+
+gen_interval = "1.0" if len(sys.argv) < 2 else sys.argv[1]
 
 vectors = [
     "Network.node[0].lnk[0]_BufferSize_1.0",
@@ -66,5 +69,5 @@ ax.set_ylabel(y_label)
 
 enable_line_toggling(fig, lines, legend)
 
-plt.show()
-# plt.savefig("test.svg")
+# plt.show()
+plt.savefig(f"Parte2-Caso2-BufferSize-{gen_interval}.svg")

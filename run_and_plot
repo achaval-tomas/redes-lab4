@@ -1,0 +1,3 @@
+#!/bin/bash
+./run_test $1
+./plot.py $1
