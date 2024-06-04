@@ -21,12 +21,12 @@ private:
     Address nodeAddress = -1;
     // Maps a *neighbour* address to its gate.
     std::unordered_map<Address, Gate> neighbourGates;
-    // bestPaths[d] = v such that routingTable[d, v] is the lowest value in its row.
+    // cheapestExits[d] = v such that costMatrix[d, v] is the lowest value in its row.
     // Maps any destination address to the gate we should send a packet destined to it.
     std::unordered_map<Address, Address> cheapestExits;
-    // routingTable[destino, vecino] = costo
+    // costMatrix[destino, vecino] = costo
     // Maps a destination address to all the known costs via all the known neighbours.
-    std::unordered_map<Address, std::unordered_map<Address, Cost>> routingTable;
+    std::unordered_map<Address, std::unordered_map<Address, Cost>> costMatrix;
 
 public:
     Net();
@@ -107,9 +107,9 @@ void Net::handleDistanceVectorMessage(DistanceVectorMsg* msg) {
         }
         auto cost = destinationCost.cost;
 
-        auto neighbourCost = routingTable[sourceAddress][cheapestExits[sourceAddress]];
+        auto neighbourCost = costMatrix[sourceAddress][cheapestExits[sourceAddress]];
         assert(neighbourCost == 1);
-        routingTable[destination][sourceAddress] = cost + neighbourCost;
+        costMatrix[destination][sourceAddress] = cost + neighbourCost;
         anyUpdate |= updateCheapestExitTo(destination);
     }
 
@@ -131,7 +131,7 @@ void Net::handleHelloMessage(HelloMsg* msg) {
     // For now, we just use hops
     Cost cost = 1;
 
-    routingTable[neighbourAddress][neighbourAddress] = cost;
+    costMatrix[neighbourAddress][neighbourAddress] = cost;
 
     bool distanceVectorChanged = updateCheapestExitTo(neighbourAddress);
     if (distanceVectorChanged) {
@@ -142,7 +142,7 @@ void Net::handleHelloMessage(HelloMsg* msg) {
 }
 
 bool Net::updateCheapestExitTo(Address destination) {
-    auto& allExitsToDestination = routingTable[destination];
+    auto& allExitsToDestination = costMatrix[destination];
     assert(!allExitsToDestination.empty());
 
     auto& cheapestExit = *std::min_element(
@@ -188,7 +188,7 @@ std::vector<DestinationCost> Net::computeDistanceVector() {
         auto& destination = destinationAndVia.first;
         auto& via = destinationAndVia.second;
 
-        auto cost = routingTable[destination][via];
+        auto cost = costMatrix[destination][via];
         distanceVector.push_back(DestinationCost { destination, cost });
     }
 
