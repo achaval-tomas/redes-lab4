@@ -1,4 +1,4 @@
-# Redes y Sistemas Distribuidos - Informe del Laboratorio 3
+# Redes y Sistemas Distribuidos - Informe del Laboratorio 4
 
 ### Integrantes del grupo:
 ```` 
@@ -28,7 +28,7 @@
 Este lab se basa en analizar e implementar algoritmos de enrutamiento de la capa de red.
 
 Primero analizamos el comportamiento de un protocolo de enrutamiento muy simple. 
-Luego, implementamos nuestro propio algoritmos de enrutamiento y vimos qué cambió con respecto a la solución inicial.
+Luego, implementamos nuestro propio algoritmo de enrutamiento y vimos qué cambió con respecto a la solución inicial.
 
 ### Información de los Nodos y Enlaces de las redes que analizaremos
 
@@ -58,7 +58,7 @@ Como se puede ver en el siguiente video, este caso consiste en que los nodos 0 y
 | Tamaño del buffer de salida del nodo 0 | Delay medido de los paquetes |
 | -------------------------------------- | ---------------------------- |
 | ![](/graficos/Parte1-Caso1-node0link0buf.png) | ![](/graficos/Parte1-Caso1-Delay.png) |
-| Como ambos nodos generadores eligen la misma ruta, el nodo 0 recibe 2 paquetes por segundo (el que genera su App y el que viene del nodo 2), pero solo puede despachar 1 por segundo, _ergo_ el aumento en su buffer | El timepo que esperan los paquetes en el buffer de salida del nodo 0 se ve reflejado en la métrica de delay, que mide el tiempo que le toma a los paquetes en llegar de su origen a su destino. | 
+| Como ambos nodos generadores eligen la misma ruta, el nodo 0 recibe 2 paquetes por segundo (el que genera su App y el que viene del nodo 2), pero solo puede despachar 1 por segundo, _ergo_ el aumento en su buffer | El tiempo que esperan los paquetes en el buffer de salida del nodo 0 se ve reflejado en la métrica de delay, que mide el tiempo que le toma a los paquetes en llegar de su origen a su destino. | 
 
 ### Caso 2 de la parte 1
 En este caso, como se puede observar, todos los nodos generan y mandan paquetes hacia el 5, excepto este último que solo recibe. Lo probaremos con distintos intervalos de generación y tomaremos algunas medidas del uso de la red.
