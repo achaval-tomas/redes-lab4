@@ -52,7 +52,10 @@ A continuación analizamos dos casos de uso de la red, y la carga que se genera 
 
 ### Caso 1 de la parte 1
 Como se puede ver en el siguiente video, este caso consiste en que los nodos 0 y 2 generan paquetes para enviar con destino al nodo 5.
-![](/graficos/Parte1-Caso1-Clip.mp4)
+
+<video width="600" controls>
+    <source src="graficos/Parte1-Caso1-Clip.mp4" type="video/mp4">
+</video>
 
 | Tamaño del buffer de salida del nodo 0 | Delay medido de los paquetes |
 | -------------------------------------- | ---------------------------- |
@@ -61,7 +64,10 @@ Como se puede ver en el siguiente video, este caso consiste en que los nodos 0 y
 
 ### Caso 2 de la parte 1
 En este caso, como se puede observar, todos los nodos generan y mandan paquetes hacia el 5, excepto este último que solo recibe. Lo probaremos con distintos intervalos de generación y tomaremos algunas medidas del uso de la red.
-![](graficos/Parte1-Caso2-Clip.mp4)
+
+<video controls>
+    <source src="graficos/Parte1-Caso2-Clip.mp4" type="video/mp4">
+</video>
 
 | Gráficos para distintos intervalos (aproximados) de generación de paquetes | Explicación |
 | ------ | ------ |
@@ -100,12 +106,18 @@ Cuando un nodo recibe un vector de distancia de un vecino, actualiza su **matriz
 
 ### Caso 1 de la parte 2
 Mismo caso que la parte 1, nodos 2 y 0 generan y envían paquetes a nodo 5.
-![](graficos/Parte2-Caso1-Clip.mp4)
+
+<video width="600" controls>
+    <source src="graficos/Parte2-Caso1-Clip.mp4" type="video/mp4">
+</video>
 
 Como se puede ver en el video, esta vez con nuestro algoritmo en acción, se seleccionan los caminos más cortos y por lo tanto todos los paquetes enviados son recibidos sin demoras extra por esperas en bufers (salvo mínimas por aleatoriedad). No hay mucho para analizar aquí pues ninguna parte de la red se satura (el intervalo de generación aqui es de 1 paquete por segundo).
 
 ### Caso 2 de la parte 2
-![](graficos/Parte2-Caso2-Clip.mp4)
+
+<video controls>
+    <source src="graficos/Parte2-Caso2-Clip.mp4" type="video/mp4">
+</video>
 
 Volvemos a analizar la carga en buffers para distintos intervalos de generación, esta vez con nuestro algoritmo en acción.
 
@@ -132,5 +144,9 @@ No ponemos los gráficos para más de 5 paquetes por segundo pues son todos de l
 - Nuestro algoritmo podría mejorarse para manejar las situaciones en las que algún nodo se cae o se incorpora un nuevo nodo. También estaría bueno que el algortimo decida la mejor ruta teniendo en cuenta la congestión de la red (es decir, que el costo no sea solamente la cantidad de saltos).
 
 ## Punto estrella: Network Star
-![](graficos/NetworkStarClip.mp4)
+
+<video controls>
+    <source src="graficos/NetworkStarClip.mp4" type="video/mp4">
+</video>
+
 Para finalizar, aquí se puede ver nuestro algoritmo funcionando en una red con una topología más compleja.
